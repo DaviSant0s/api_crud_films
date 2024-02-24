@@ -1,6 +1,8 @@
+const uuid = require('uuid');
+
 const users = [
     {
-        "id": 1,
+        "id": "1f73e184-4447-4534-8a41-a80d35a787cb",
         "name": "John Doe",
         "email": "John.doe@example.com",
         "password": "password123",
@@ -8,7 +10,7 @@ const users = [
     },
 
     {
-        "id": 2,
+        "id": "a317e95e-6716-45cc-9a7c-e8cc042b6474",
         "name": "Davi santos",
         "email": "John.doe@example.com",
         "password": "password123",
@@ -23,7 +25,7 @@ const list = (req, res) => {
 const getById = (req, res) => {
     const { id } = req.params;
 
-    const user = users.find(u => u.id === Number(id));
+    const user = users.find(u => u.id === id);
 
     if(!user){
         return res.status(400).json({
@@ -38,7 +40,9 @@ const getById = (req, res) => {
 }
 
 const create = (req, res) => {
-    const { id, name, email, password, age } = req.body;
+    const { name, email, password, age } = req.body;
+
+    const id = uuid.v4();
 
     const user = {
         id,
@@ -57,7 +61,7 @@ const update = (req, res) => {
     const { id } = req.params;
     const { name, email, password, age } = req.body;
 
-    const userIndex = users.findIndex(u => u.id === Number(id));
+    const userIndex = users.findIndex(u => u.id === id);
 
     if (userIndex < 0) {
         return res.json({
@@ -67,7 +71,7 @@ const update = (req, res) => {
     }
 
     const userUpdated = {
-        id: Number(id),
+        id,
         name,
         email,
         password,
@@ -82,11 +86,11 @@ const update = (req, res) => {
 const remove = (req, res) => {
     const { id } = req.params;
 
-    const userIndex = users.findIndex(u => u.id === Number(id));
+    const userIndex = users.findIndex(u => u.id === id);
 
     if ( userIndex < 0){
         return res.status(400).json({
-            error: '@users/update',
+            error: '@users/remove',
             message: `User not found ${id}`
         })
     }

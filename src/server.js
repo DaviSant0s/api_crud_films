@@ -3,6 +3,7 @@ const express = require('express');
 
 // rotas
 const userRoutes = require('./routes/users.routes');
+const movieRoutes = require('./routes/movies.routes');
 
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.json());
 
 // que que ta depois do buffer
 app.use(userRoutes);
+app.use(movieRoutes);
 
 app.listen(PORT, () => {
     console.log(`Api is running on port ${PORT}` );
