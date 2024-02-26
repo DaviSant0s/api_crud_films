@@ -1,5 +1,7 @@
+const jwt = require('jsonwebtoken');
 const { userDatabase } = require('./users.controller');
 const { compareHash } = require('../utils/hashProvider');
+const jsonwebtoken = require('jsonwebtoken');
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -28,10 +30,26 @@ const login = async (req, res) => {
     return res.status(400).json(loginErrorMessage);
   }
 
+  // vamos passar os dados que vão conter nesse token, ou seja, o payload do usuário
+  /**
+   * no segundo parâmetro vamos passar um secret, ou seja, vamos criar um hash uma
+   * informação que só a nossa aplicação vai saber, tanto criar esse hash como decifrar
+   * esse hash posteriormente e obter as informações que estão dentro desse token.
+   * 
+   * Então precisamos ter esse secret para podermos decriptar nossa informação 
+   * posteriormente
+   * 
+   * E no lugar de secret pode ser qualquer nome
+   * 
+   */
+  const token = jwt.sign(user, 'secret', {
+    expiresIn: "1h",
+  });
+
   // estamos removendo a chave password de user
   delete user.password;
 
-  return res.json(user);
+  return res.json({...user, token });
 }
 
 module.exports = {

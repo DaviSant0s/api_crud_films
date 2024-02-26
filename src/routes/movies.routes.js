@@ -2,6 +2,8 @@ const { Router } = require('express');
 
 const moviesController = require('../controllers/movies.controller');
 
+const { verifyAuthentication } = require('../middlewares/verifyAuthentication');
+
 const routes = Router();
 
 // listagem de filmes
@@ -11,7 +13,7 @@ routes.get('/movies', moviesController.list);
 routes.get('/movies/:id', moviesController.getById);
 
 // criação de novos filmes
-routes.post('/movies', moviesController.create);
+routes.post('/movies', verifyAuthentication, moviesController.create);
 
 // edição de filmes
 routes.put('/movies/:id', moviesController.update);

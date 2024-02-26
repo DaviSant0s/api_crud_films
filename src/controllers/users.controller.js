@@ -5,7 +5,7 @@ const users = [
     {
         "id": "d4e6852f-3f55-45ce-a794-79edde434b19",
         "name": "Davi Santos",
-        "email": "daviir17@gmail.com",
+        "email": "davir17@gmail.com",
         "password": "$2a$08$BXp0eC5z/wMLLE0qJdh7oeg3Nrcx8OaAUC9qTK5ajvwsE2VOueKC6",
         "age": 24
     },

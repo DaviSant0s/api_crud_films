@@ -17,6 +17,8 @@ const movies = [
 ];
 
 const create = (req, res) => {
+    return res.json(req.user.id);
+
     const { title, description, year, genres, image, video }  = req.body;
 
     const id = uuid.v4();
