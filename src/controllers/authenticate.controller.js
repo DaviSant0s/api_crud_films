@@ -1,4 +1,7 @@
 const jwt = require('jsonwebtoken');
+
+const { JWT_SECRET } = require('../config/env');
+
 const { userDatabase } = require('./users.controller');
 const { compareHash } = require('../utils/hashProvider');
 const jsonwebtoken = require('jsonwebtoken');
@@ -42,7 +45,7 @@ const login = async (req, res) => {
    * E no lugar de secret pode ser qualquer nome
    * 
    */
-  const token = jwt.sign(user, 'secret', {
+  const token = jwt.sign(user, JWT_SECRET, {
     expiresIn: "1h",
   });
 

@@ -1,6 +1,8 @@
 // express
 const express = require('express');
 
+const { PORT } = require('./config/env.js');
+
 // rotas
 const userRoutes = require('./routes/users.routes');
 const movieRoutes = require('./routes/movies.routes');
@@ -8,8 +10,6 @@ const authenticateRoutes = require('./routes/authenticate.routes');
 
 
 const app = express();
-
-const PORT = 3333;
 
 // converte o buffer para json
 app.use(express.json());

@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 
+const { JWT_SECRET } = require('../config/env');
+
 const verifyAuthentication = (req, res, next) => {
   const { authorization } = req.headers;
 
@@ -35,7 +37,7 @@ const verifyAuthentication = (req, res, next) => {
   //verificar se o token é válido, ou seja, está assinado com o secret
   // E se ele está dentro do prazo de expiração
   
-  jwt.verify(token, 'secret', (err, decoded) => {
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
     if(err){
       console.log(err);
       return res.status(401).json(invalidTokenMessage);
