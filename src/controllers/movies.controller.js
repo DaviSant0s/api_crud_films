@@ -2,17 +2,19 @@ const uuid = require('uuid');
 
 const movies = [
     {
-		"id": "f048ec60-ba05-4c6e-ad96-d33e5d464986",
-		"title": "Inception",
-		"description": "Dom Cobb (Leonardo DiCaprio) is a skilled thief, the absolute best in the dangerous art of extraction, stealing valuable secrets from deep within the subconscious during the dream state.",
-		"year": 2010,
-		"genres": [
+		id: "f048ec60-ba05-4c6e-ad96-d33e5d464986",
+		title: "Inception",
+		description: "Dom Cobb (Leonardo DiCaprio) is a skilled thief, the absolute best in the dangerous art of extraction, stealing valuable secrets from deep within the subconscious during the dream state.",
+		year: 2010,
+		genres: [
 			"Action",
 			"Adventure",
 			"Sci-Fi"
 		],
-		"image": "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-		"video": "https://www.youtube.com/watch?v=YoHD9XEInc0"
+		image: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
+		video: "https://www.youtube.com/watch?v=YoHD9XEInc0",
+        createdAt: new Date(),
+        updatedAt: new Date(),
 	}
 ];
 
@@ -31,6 +33,8 @@ const create = (req, res) => {
         genres,
         image, 
         video,
+        createdAt: new Date,
+        updatedAt: new Date
     }
 
     movies.push(movie);
@@ -51,6 +55,8 @@ const update = (req, res) => {
         });
     }
 
+    const { createdAt } = movies[movieIndex];
+
     const movieUpdated = {
         id,
         title,
@@ -58,7 +64,9 @@ const update = (req, res) => {
         year,
         genres,
         image,
-        video
+        video,
+        createdAt,
+        updatedAt: new Date(),
     }
 
     movies[movieIndex] = movieUpdated;

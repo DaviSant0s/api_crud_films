@@ -3,18 +3,22 @@ const { generateHash } = require('../utils/hashProvider');
 
 const users = [
     {
-        "id": "d4e6852f-3f55-45ce-a794-79edde434b19",
-        "name": "Davi Santos",
-        "email": "davir17@gmail.com",
-        "password": "$2a$08$BXp0eC5z/wMLLE0qJdh7oeg3Nrcx8OaAUC9qTK5ajvwsE2VOueKC6",
-        "age": 24
+        id: "d4e6852f-3f55-45ce-a794-79edde434b19",
+        name: "Davi Santos",
+        email: "davir17@gmail.com",
+        password: "$2a$08$BXp0eC5z/wMLLE0qJdh7oeg3Nrcx8OaAUC9qTK5ajvwsE2VOueKC6",
+        age: 24,
+        createdAt: new Date(),
+        updatedAt: new Date(),
     },
     {
-        "id": "40edf2ad-7af2-400d-8d84-e4b7af0fa09a",
-        "name": "John Doe",
-        "email": "John.doe@example.com",
-        "password": "$2a$08$QypmLoAmHB8CuPfqAKcwPeyNJGrZAbBvbYsXrWn3vHOBtGttOrtpm",
-        "age": 21
+        id: "40edf2ad-7af2-400d-8d84-e4b7af0fa09a",
+        name: "John Doe",
+        email: "John.doe@example.com",
+        password: "$2a$08$QypmLoAmHB8CuPfqAKcwPeyNJGrZAbBvbYsXrWn3vHOBtGttOrtpm",
+        age: 21,
+        createdAt: new Date(),
+        updatedAt: new Date(),
     }
 ];
 
@@ -51,7 +55,9 @@ const create = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        age
+        age,
+        createdAt: new Date(),
+        updatedAt: new Date(),
     };
 
     users.push(user);
@@ -59,7 +65,7 @@ const create = async (req, res) => {
     return res.status(201).json(user);
 }
 
-const update = (req, res) => {
+const update = async (req, res) => {
     const { id } = req.params;
     const { name, email, password, age } = req.body;
 
@@ -72,12 +78,21 @@ const update = (req, res) => {
         });
     }
 
+    const { createdAt } = users[userIndex];
+
     const userUpdated = {
         id,
         name,
         email,
-        password,
         age,
+        createdAt,
+        updatedAt: new Date(),
+    }
+
+    if(password){
+        userUpdated.password = await generateHash(password)
+    } else {
+        userUpdated.password = users[userIndex].password;
     }
 
     users[userIndex] = userUpdated;

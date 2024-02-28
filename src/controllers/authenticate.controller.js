@@ -45,14 +45,18 @@ const login = async (req, res) => {
    * E no lugar de secret pode ser qualquer nome
    * 
    */
+
+
+  const userLoged = { ...user }
+
   const token = jwt.sign(user, JWT_SECRET, {
     expiresIn: "1h",
   });
 
   // estamos removendo a chave password de user
-  delete user.password;
+  delete userLoged.password;
 
-  return res.json({...user, token });
+  return res.json({...userLoged, token });
 }
 
 module.exports = {
