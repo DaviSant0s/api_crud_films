@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const { generateHash } = require('../utils/hashProvider');
+
 // Vamos passar um objeto com meu schema contendo todos os meus usuários
 // quando for requerido é true
 const UserSchema = new mongoose.Schema({
@@ -31,6 +33,29 @@ const UserSchema = new mongoose.Schema({
 }
 
 );
+
+UserSchema.pre("save", async function(next){
+  // Esse this é a referência do nosso documento
+  const user = this;
+
+  user.password = await generateHash(user.password);
+
+  return next();
+});
+
+UserSchema.pre("findOneAndUpdate", async function(next){
+  // Esse this é a referência do nosso documento
+  const doc = this;
+
+  userUpdated = doc.getUpdate();
+
+  if(userUpdated.password){
+    userUpdated.password = await generateHash(userUpdated.password);
+  }
+
+  return next();
+});
+
 
 // com isso a gente vai poder imoportar esse model e utilizar ele no crud
 // Vou passar o nome da minha collection e o Schema referente dessa collection (qual o tipo de documento que essa collection espera receber)

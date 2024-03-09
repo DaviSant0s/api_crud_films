@@ -1,9 +1,4 @@
-const { generateHash } = require('../utils/hashProvider');
-
 const UserModel = require('../model/user.model');
-
-
-const users = [];
 
 const list = async (req, res) => {
     try {
@@ -43,13 +38,11 @@ const getById = async (req, res) => {
 const create = async (req, res) => {
     const { name, email, password, age } = req.body;
 
-    const hashedPassword = await generateHash(password);
-
     try {
         const user = await UserModel.create({
             name,
             email,
-            password: hashedPassword,
+            password,
             age,
         });  
         
@@ -73,7 +66,7 @@ const update = async (req, res) => {
         const userUpdated = await UserModel.findByIdAndUpdate(id, {
             name, 
             email, 
-            password: await generateHash(password), 
+            password, 
             age
         }, 
         // pra ele retorna o atualizado, se não ele pega a versão anterior
@@ -92,6 +85,7 @@ const update = async (req, res) => {
         });
     }
 }
+
 
 const remove = async (req, res) => {
     const { id } = req.params;
@@ -121,5 +115,4 @@ module.exports = {
     create,
     update,
     remove,
-    userDatabase: users,
 }
