@@ -1,121 +1,118 @@
-const uuid = require('uuid');
 const { generateHash } = require('../utils/hashProvider');
 
-const users = [
-    {
-        id: "d4e6852f-3f55-45ce-a794-79edde434b19",
-        name: "Davi Santos",
-        email: "davir17@gmail.com",
-        password: "$2a$08$BXp0eC5z/wMLLE0qJdh7oeg3Nrcx8OaAUC9qTK5ajvwsE2VOueKC6",
-        age: 24,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    },
-    {
-        id: "40edf2ad-7af2-400d-8d84-e4b7af0fa09a",
-        name: "John Doe",
-        email: "John.doe@example.com",
-        password: "$2a$08$QypmLoAmHB8CuPfqAKcwPeyNJGrZAbBvbYsXrWn3vHOBtGttOrtpm",
-        age: 21,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    }
-];
+const UserModel = require('../model/user.model');
 
-const list = (req, res) => {
-    return res.json(users);
+
+const users = [];
+
+const list = async (req, res) => {
+    try {
+        // Retorna todos, mas sem a chave de password.
+        const users = await UserModel.find({}, { password: 0});
+        return res.json(users);
+    } catch (err) {
+        return res.status(400).json({
+            error: '@users/list',
+            message: err.message || 'Failed to list users',
+        });
+    }
+
 }
 
-const getById = (req, res) => {
+const getById = async (req, res) => {
     const { id } = req.params;
 
-    const user = users.find(u => u.id === id);
+    try {
+        // const user = await UserModel.find({ _id: id}, { password: 0});
+        const user = await UserModel.findById(id, { password: 0});
 
-    if(!user){
+        if(!user) {
+            throw new Error();
+        }
+
+        return res.json(user);
+        
+    } catch (err) {
         return res.status(400).json({
-            // Isso é para o frontend saber onde deu o erro
             error: '@users/getById',
-            // mensagem de erro
-            message: `User not found ${id}`
-        })
+            message: err.message || `User not found ${id}`,
+        });
     }
-
-    return res.json(user);
 }
 
 const create = async (req, res) => {
     const { name, email, password, age } = req.body;
 
-    const id = uuid.v4();
-
     const hashedPassword = await generateHash(password);
 
-    const user = {
-        id,
-        name,
-        email,
-        password: hashedPassword,
-        age,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-    };
+    try {
+        const user = await UserModel.create({
+            name,
+            email,
+            password: hashedPassword,
+            age,
+        });  
+        
+        return res.status(201).json(user);
 
-    users.push(user);
-    
-    return res.status(201).json(user);
+    } catch (err) {
+        return res.status(400).json({
+            error: '@users/create',
+            message: err.message || 'Failed to create',
+        });
+    }
+
 }
 
 const update = async (req, res) => {
     const { id } = req.params;
     const { name, email, password, age } = req.body;
 
-    const userIndex = users.findIndex(u => u.id === id);
+    try {
+        // primeiro eu passo o id e depois coloco na chave os campos que eu vou editar
+        const userUpdated = await UserModel.findByIdAndUpdate(id, {
+            name, 
+            email, 
+            password: await generateHash(password), 
+            age
+        }, 
+        // pra ele retorna o atualizado, se não ele pega a versão anterior
+        { new: true });
 
-    if (userIndex < 0) {
-        return res.json({
+        if (!userUpdated){
+            throw new Error();
+        }
+        
+        return res.json(userUpdated);
+        
+    } catch (err) {
+        return res.status(400).json({
             error: '@users/update',
-            message: `User not found ${id}`
+            message: err.message || `User not found ${id}`,
         });
     }
-
-    const { createdAt } = users[userIndex];
-
-    const userUpdated = {
-        id,
-        name,
-        email,
-        age,
-        createdAt,
-        updatedAt: new Date(),
-    }
-
-    if(password){
-        userUpdated.password = await generateHash(password)
-    } else {
-        userUpdated.password = users[userIndex].password;
-    }
-
-    users[userIndex] = userUpdated;
-
-    return res.json(userUpdated);
 }
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
     const { id } = req.params;
 
-    const userIndex = users.findIndex(u => u.id === id);
+    try {
 
-    if ( userIndex < 0){
+        const userDeleted = await UserModel.findByIdAndDelete(id);
+
+        if(!userDeleted){
+            throw new Error();
+        }
+        
+        // não vamos retonar nada, pois nao é necessário
+        return res.status(204).send();
+
+    } catch (err) {
         return res.status(400).json({
             error: '@users/remove',
-            message: `User not found ${id}`
+            message: err.message || `User not found ${id}`
         })
-    }
-
-    users.splice(userIndex, 1);
-
-    // não vamos retonar nada, pois nao é necessário
-    return res.send();
+    } 
 }
 
 module.exports = {

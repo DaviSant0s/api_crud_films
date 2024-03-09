@@ -1,6 +1,8 @@
 // express
 const express = require('express');
 
+require('./config/database.js');
+
 const { PORT } = require('./config/env.js');
 
 // rotas
