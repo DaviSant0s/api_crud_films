@@ -1,115 +1,113 @@
-const uuid = require('uuid');
+const MovieModel = require('../model/movie.model');
 
-const movies = [
-    {
-		id: "f048ec60-ba05-4c6e-ad96-d33e5d464986",
-		title: "Inception",
-		description: "Dom Cobb (Leonardo DiCaprio) is a skilled thief, the absolute best in the dangerous art of extraction, stealing valuable secrets from deep within the subconscious during the dream state.",
-		year: 2010,
-		genres: [
-			"Action",
-			"Adventure",
-			"Sci-Fi"
-		],
-		image: "https://www.themoviedb.org/t/p/w600_and_h900_bestv2/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg",
-		video: "https://www.youtube.com/watch?v=YoHD9XEInc0",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-	}
-];
-
-const create = (req, res) => {
-    /* return res.json(req.user.id); */
-
+const create = async (req, res) => {
     const { title, description, year, genres, image, video }  = req.body;
 
-    const id = uuid.v4();
+    try {
+        const movie = await MovieModel.create({
+            title,
+            description,
+            year,
+            genres,
+            image, 
+            video,
+        });
+        
+        return res.status(201).json(movie);
 
-    const movie = {
-        id,
-        title,
-        description,
-        year,
-        genres,
-        image, 
-        video,
-        createdAt: new Date,
-        updatedAt: new Date
+    } catch (err) {
+        return res.status(400).json({
+            error: '@movies/create',
+            message: err.message || 'Failed to create movies',
+        })
     }
 
-    movies.push(movie);
-
-    return res.status(201).json(movie);
 }
 
-const update = (req, res) => {
+const update = async (req, res) => {
     const { id } = req.params;
     const { title, description, year, genres, image, video } = req.body;
 
-    const movieIndex = movies.findIndex(m => m.id === id);
-
-    if (movieIndex < 0) {
-        return res.json({
+    try {
+        const movieUpdated = await MovieModel.findByIdAndUpdate(id, {
+            title,
+            description,
+            year,
+            genres,
+            image,
+            video,
+        }, {
+            new: true,
+        });
+        
+        return res.json(movieUpdated);
+        
+    } catch (err) {
+        return res.status(400).json({
             error: '@novies/update',
-            message: `Movie not found ${id}`
+            message: err.message || `Movie not found ${id}`
         });
     }
+}
 
-    const { createdAt } = movies[movieIndex];
+const list = async (req, res) => {
 
-    const movieUpdated = {
-        id,
-        title,
-        description,
-        year,
-        genres,
-        image,
-        video,
-        createdAt,
-        updatedAt: new Date(),
+    try {
+        const movies = await MovieModel.find();
+        return res.json(movies);
+        
+    } catch (err) {
+        return res.status(400).json({
+            error: '@movies/list',
+            message: err.message || 'Failed to list movies',
+        })
     }
 
-    movies[movieIndex] = movieUpdated;
-
-    return res.json(movieUpdated);
 }
 
-const list = (req, res) => {
-    return res.json(movies);
-}
-
-const getById = (req, res) => {
+const getById = async (req, res) => {
     const { id } = req.params;
 
-    const movie = movies.find(m => m.id === id);
+    
+    try {
+        const movie = await MovieModel.findById(id);
 
-    if(!movie){
+        if(!movie) {
+            throw new Error();
+        }    
+
+        return res.json(movie);
+
+    } catch (err) {
         return res.status(400).json({
             error: '@movies/getById',
-            message: `Movie not found ${id}`
+            message: err.message || `Movie not found ${id}`,
         })
     }
-
-    return res.json(movie);
-
 }
 
-const remove = (req, res) => {
+const remove = async (req, res) => {
     const { id } = req.params;
 
-    const movieIndex = movies.findIndex(m => m.id === id);
+    
+    try {
+        const movieRemoved = await MovieModel.findByIdAndDelete(id);
 
-    if (movieIndex < 0){
+        if(!movieRemoved){
+            throw new Error();
+        }
+
+
+        return res.status(204).send();
+        
+    } catch (err) {
+        
         return res.status(400).json({
             error: '@movies/remove',
-            message: `Movie not found ${id}`
+            message: err.message || `Movie not found ${id}`
         })
     }
 
-    movies.splice(movieIndex, 1);
-
-    // não vamos retonar nada, pois nao é necessário
-    return res.send();
 }
 
 module.exports = {

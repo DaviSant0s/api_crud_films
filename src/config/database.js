@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 
-mongoose.connect('mongodb+srv://davisant_os:davi2427571@myprojects.cjeo6td.mongodb.net/telos?retryWrites=true&w=majority&appName=MyProjects',
+const { MONGO_DB_URI } = require('./env');
+
+mongoose.connect(MONGO_DB_URI,
 {
   // isso aqui é por causa do bendito email único, não de muita bola pra isso não
   autoIndex: true

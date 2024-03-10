@@ -2,14 +2,19 @@ const jwt = require('jsonwebtoken');
 
 const { JWT_SECRET } = require('../config/env');
 
-const { userDatabase } = require('./users.controller');
+const UserModel = require('../model/user.model');
+
 const { compareHash } = require('../utils/hashProvider');
 const jsonwebtoken = require('jsonwebtoken');
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
-  const user = userDatabase.find(u => u.email === email);
+  // O .lean vai fazer trazer apenas os dados do nosso documento
+  // Não vai trazer os atributos da classe do mongoose
+  const user = await UserModel.findOne({ email }).lean();
+
+  console.log(user);
 
   const loginErrorMessage = {
     error: "@authenticate/login",
@@ -46,17 +51,14 @@ const login = async (req, res) => {
    * 
    */
 
-
-  const userLoged = { ...user }
-
   const token = jwt.sign(user, JWT_SECRET, {
     expiresIn: "1h",
   });
 
   // estamos removendo a chave password de user
-  delete userLoged.password;
+  delete user.password;
 
-  return res.json({...userLoged, token });
+  return res.json({ ...user, token });
 }
 
 module.exports = {

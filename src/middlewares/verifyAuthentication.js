@@ -43,6 +43,7 @@ const verifyAuthentication = (req, res, next) => {
       return res.status(401).json(invalidTokenMessage);
     }
 
+    console.log(decoded)
     req.user = decoded;
 
     return next();
